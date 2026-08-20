@@ -32,7 +32,27 @@
 /* natural Korean line-breaking: never split a word/sentence ending by syllable */
 h1,h2,h3,p,.lead,.quote,.legend,.chip,.step b,.step span,.mini-table th,.mini-table td,.footer-note{word-break:keep-all;overflow-wrap:normal}
 .slide p,.card p,.step span,.legend span{line-break:strict}
-@media(min-width:1200px){.slide{padding-left:7.2vw;padding-right:7.2vw}.cover .block{max-width:1320px}}
+
+
+/* left section tabs */
+.section-tabs{position:fixed;z-index:70;left:18px;top:92px;width:104px;display:flex;flex-direction:column;gap:10px}
+.section-tab{appearance:none;border:1px solid rgba(255,255,255,.1);background:rgba(14,17,15,.92);color:#dbe7df;border-radius:16px;padding:13px 12px;font-size:13px;font-weight:900;line-height:1.25;letter-spacing:-.01em;text-align:left;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.18);transition:all .2s ease}
+.section-tab:hover{transform:translateY(-1px);border-color:rgba(184,255,44,.45);color:#fff}
+.section-tab.active{background:#fff;color:#111;border-color:#dfe7e1;box-shadow:0 12px 34px rgba(0,0,0,.14)}
+.section-tab small{display:block;font-size:11px;font-weight:700;opacity:.72;margin-top:4px}
+.section-tab.sa.active{color:var(--naver);border-color:rgba(3,199,90,.28)}
+.section-tab.gfa.active{color:#6c9800;border-color:rgba(184,255,44,.45)}
+.section-tab.coupang.active{color:var(--coupang-blue);border-color:rgba(22,116,232,.28)}
+.section-tab.mobion.active{color:var(--mobon);border-color:rgba(105,200,95,.3)}
+.slide{padding-left:calc(118px + 6vw)!important}
+
+@media(max-width:1024px){
+  .section-tabs{left:14px;right:14px;top:78px;width:auto;flex-direction:row;overflow:auto;padding-bottom:4px}
+  .section-tab{min-width:112px;white-space:nowrap}
+  .slide{padding-left:8vw!important;padding-top:142px}
+}
+
+@media(min-width:1200px){.slide{padding-left:calc(118px + 5.2vw)!important;padding-right:7.2vw}.cover .block{max-width:1320px}}
 
 /* AI report slide */
 .ai-report-shell{margin-top:30px;background:#fff;border:1px solid var(--line);border-radius:26px;box-shadow:0 18px 55px rgba(15,34,22,.08);overflow:hidden}
@@ -48,6 +68,12 @@ h1,h2,h3,p,.lead,.quote,.legend,.chip,.step b,.step span,.mini-table th,.mini-ta
 <body>
 <div class="app">
 <header class="topbar"><div class="brand">LinkPrice <span>Integrated Proposal</span></div><div class="tools"><button class="btn" id="menuBtn">☰ <span>목차</span></button><button class="btn" id="fullBtn">⛶ <span>전체화면</span></button><button class="btn" onclick="window.print()">⌁ <span>PDF</span></button></div></header>
+<aside class="section-tabs" id="sectionTabs">
+<button class="section-tab sa" data-group="sa">네이버 SA<small>검색광고</small></button>
+<button class="section-tab gfa" data-group="gfa">GFA<small>디스플레이</small></button>
+<button class="section-tab coupang" data-group="coupang">쿠팡<small>커머스</small></button>
+<button class="section-tab mobion" data-group="mobion">모비온<small>추가매체</small></button>
+</aside>
 <div class="deck" id="deck">
 
 <section class="slide cover" data-title="Cover"><div class="section-cover"><div class="block"><div class="eyebrow">LINKPRICE · INTEGRATED ADVERTISING PROPOSAL</div><h1>검색부터 발견, 구매까지.<br><span class="accent">매출이 이어지는 광고 구조</span>를 설계합니다.</h1><div class="cover-line"></div><p class="lead">NAVER SA · NAVER GFA · COUPANG · 추가매체 MOBION을 하나의 성과 흐름으로 연결한 통합 광고 제안서</p><div class="media-legend"><div class="legend"><b style="color:#03c75a">NAVER SA</b><span>고의도 검색 수요 포착과 구매 전환</span></div><div class="legend"><b style="color:#b8ff2c">NAVER GFA</b><span>신규 수요 창출과 리타겟팅</span></div><div class="legend"><b style="color:#70b7ff">COUPANG</b><span>커머스 내 매출 볼륨과 ROAS 확장</span></div><div class="legend"><b style="color:#7cd871">MOBION</b><span>외부 네트워크 확장과 데이터 기반 전환</span></div></div></div></div><div class="watermark">LP</div></section>
@@ -111,13 +137,82 @@ h1,h2,h3,p,.lead,.quote,.legend,.chip,.step b,.step span,.mini-table th,.mini-ta
 <div class="menu" id="menu"><h3>CONTENTS</h3><div class="menu-grid" id="menuGrid"></div></div>
 </div>
 <script>
-const deck=document.getElementById('deck'),slides=[...document.querySelectorAll('.slide')],pager=document.getElementById('pager'),progress=document.getElementById('progress'),menu=document.getElementById('menu'),menuGrid=document.getElementById('menuGrid');let i=0;
+const deck=document.getElementById('deck'),slides=[...document.querySelectorAll('.slide')],pager=document.getElementById('pager'),progress=document.getElementById('progress'),menu=document.getElementById('menu'),menuGrid=document.getElementById('menuGrid');
+const prevBtn=document.getElementById('prev'),nextBtn=document.getElementById('next');
+const tabButtons=[...document.querySelectorAll('.section-tab')];
+let i=0,activeGroup='all';
 const pad=n=>String(n).padStart(2,'0');
-function go(n){i=Math.max(0,Math.min(slides.length-1,n));deck.style.transform=`translateX(${-i*100}vw)`;pager.textContent=`${pad(i+1)} / ${pad(slides.length)}`;progress.style.width=`${((i+1)/slides.length)*100}%`;history.replaceState(null,'',`#page-${i+1}`);menu.classList.remove('open')}
-slides.forEach((s,idx)=>{const a=document.createElement('a');a.href=`#page-${idx+1}`;a.innerHTML=`<b>${pad(idx+1)} · ${s.dataset.title||'Page'}</b><small>${idx===0?'통합 제안서 시작':'클릭하여 해당 페이지로 이동'}</small>`;a.onclick=e=>{e.preventDefault();go(idx)};menuGrid.appendChild(a)});
-document.getElementById('prev').onclick=()=>go(i-1);document.getElementById('next').onclick=()=>go(i+1);document.getElementById('menuBtn').onclick=()=>menu.classList.toggle('open');document.getElementById('fullBtn').onclick=()=>{if(!document.fullscreenElement)document.documentElement.requestFullscreen?.();else document.exitFullscreen?.()};
-addEventListener('keydown',e=>{if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();go(i+1)}if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();go(i-1)}if(e.key==='Home')go(0);if(e.key==='End')go(slides.length-1);if(e.key==='Escape')menu.classList.remove('open')});
-let sx=0;addEventListener('touchstart',e=>sx=e.changedTouches[0].screenX,{passive:true});addEventListener('touchend',e=>{const dx=e.changedTouches[0].screenX-sx;if(Math.abs(dx)>55)go(i+(dx<0?1:-1))},{passive:true});
-const m=location.hash.match(/page-(\d+)/);go(m?Number(m[1])-1:0);
+const groupLabel={all:'전체',sa:'네이버 SA',gfa:'GFA',coupang:'쿠팡',mobion:'모비온'};
+function detectGroup(slide){
+  const t=(slide.dataset.title||'').toUpperCase();
+  if(t.startsWith('NAVER SA')) return 'sa';
+  if(t.startsWith('NAVER GFA')) return 'gfa';
+  if(t.startsWith('COUPANG')) return 'coupang';
+  if(t.startsWith('MOBION')) return 'mobion';
+  return 'all';
+}
+const groupSlides={all:slides.map((_,idx)=>idx),sa:[],gfa:[],coupang:[],mobion:[]};
+slides.forEach((slide,idx)=>{const g=detectGroup(slide);slide.dataset.group=g;if(g!=='all') groupSlides[g].push(idx);});
+function visibleIndices(){return activeGroup==='all'?groupSlides.all:groupSlides[activeGroup];}
+function currentVisiblePos(){const arr=visibleIndices();const pos=arr.indexOf(i);return pos>-1?pos:0;}
+function updateTabs(){tabButtons.forEach(btn=>btn.classList.toggle('active',btn.dataset.group===activeGroup));}
+function buildMenu(){
+  menuGrid.innerHTML='';
+  const arr=visibleIndices();
+  arr.forEach((abs,localIdx)=>{
+    const s=slides[abs];
+    const a=document.createElement('a');
+    a.href=`#page-${abs+1}`;
+    const title=s.dataset.title||'Page';
+    const helper=localIdx===0 ? `${groupLabel[activeGroup]} 섹션 시작` : '클릭하여 해당 페이지로 이동';
+    a.innerHTML=`<b>${pad(localIdx+1)} · ${title}</b><small>${helper}</small>`;
+    a.onclick=e=>{e.preventDefault();goAbs(abs)};
+    menuGrid.appendChild(a);
+  });
+}
+function updatePager(){
+  const arr=visibleIndices();
+  const pos=currentVisiblePos();
+  if(activeGroup==='all') pager.textContent=`${pad(i+1)} / ${pad(slides.length)}`;
+  else pager.textContent=`${groupLabel[activeGroup]} ${pad(pos+1)} / ${pad(arr.length)}`;
+  progress.style.width=`${((pos+1)/arr.length)*100}%`;
+  prevBtn.disabled=pos===0; nextBtn.disabled=pos===arr.length-1;
+  prevBtn.style.opacity=pos===0?.45:1; nextBtn.style.opacity=pos===arr.length-1?.45:1;
+}
+function goAbs(n){
+  i=Math.max(0,Math.min(slides.length-1,n));
+  deck.style.transform=`translateX(${-i*100}vw)`;
+  updatePager();
+  history.replaceState(null,'',`#page-${i+1}`);
+  menu.classList.remove('open');
+}
+function goRelative(step){
+  const arr=visibleIndices();
+  const nextPos=Math.max(0,Math.min(arr.length-1,currentVisiblePos()+step));
+  goAbs(arr[nextPos]);
+}
+function setGroup(group,jumpToStart=true){
+  activeGroup=group;
+  updateTabs();
+  buildMenu();
+  const arr=visibleIndices();
+  if(!arr.length) return;
+  if(jumpToStart || !arr.includes(i)) goAbs(arr[0]);
+  else updatePager();
+}
+
+tabButtons.forEach(btn=>btn.addEventListener('click',()=>setGroup(btn.dataset.group,true)));
+prevBtn.onclick=()=>goRelative(-1); nextBtn.onclick=()=>goRelative(1);
+document.getElementById('menuBtn').onclick=()=>{buildMenu();menu.classList.toggle('open')};
+document.getElementById('fullBtn').onclick=()=>{if(!document.fullscreenElement)document.documentElement.requestFullscreen?.();else document.exitFullscreen?.()};
+addEventListener('keydown',e=>{
+  if(['ArrowRight','PageDown',' '].includes(e.key)){e.preventDefault();goRelative(1)}
+  if(['ArrowLeft','PageUp'].includes(e.key)){e.preventDefault();goRelative(-1)}
+  if(e.key==='Home'){const arr=visibleIndices();goAbs(arr[0]);}
+  if(e.key==='End'){const arr=visibleIndices();goAbs(arr[arr.length-1]);}
+  if(e.key==='Escape')menu.classList.remove('open');
+});
+let sx=0;addEventListener('touchstart',e=>sx=e.changedTouches[0].screenX,{passive:true});addEventListener('touchend',e=>{const dx=e.changedTouches[0].screenX-sx;if(Math.abs(dx)>55)goRelative(dx<0?1:-1)},{passive:true});
+const m=location.hash.match(/page-(\d+)/);const initial=m?Math.max(0,Math.min(slides.length-1,Number(m[1])-1)):0;const initialGroup=slides[initial]?.dataset.group||'all';activeGroup=initialGroup==='all'?'all':initialGroup;updateTabs();buildMenu();goAbs(initial);
 </script>
 </body></html>
