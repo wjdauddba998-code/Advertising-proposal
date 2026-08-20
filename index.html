@@ -144,9 +144,9 @@ let i=0,activeGroup='all';
 const pad=n=>String(n).padStart(2,'0');
 const groupLabel={all:'전체',sa:'네이버 SA',gfa:'GFA',coupang:'쿠팡',mobion:'모비온'};
 function detectGroup(slide){
-  const t=(slide.dataset.title||'').toUpperCase();
-  if(t.startsWith('NAVER SA')) return 'sa';
-  if(t.startsWith('NAVER GFA')) return 'gfa';
+  const t=(slide.dataset.title||'').toUpperCase().trim();
+  if(t.startsWith('NAVER SA') || t.startsWith('SA ·') || t.startsWith('SA ')) return 'sa';
+  if(t.startsWith('NAVER GFA') || t.startsWith('GFA ·') || t.startsWith('GFA ')) return 'gfa';
   if(t.startsWith('COUPANG')) return 'coupang';
   if(t.startsWith('MOBION')) return 'mobion';
   return 'all';
