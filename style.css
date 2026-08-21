@@ -230,3 +230,122 @@ h1,h2,h3,.quote,.leak-banner strong{
   .leak-banner{grid-template-columns:1fr}
   .da-shot img{max-height:none}
 }
+
+/* v3 - DA creative reference */
+.reference-grid{
+  display:grid;
+  grid-template-columns:1.12fr 1fr 1fr;
+  grid-template-rows:repeat(2, minmax(0,1fr));
+  gap:14px;
+  height:455px;
+}
+.reference-card{
+  position:relative;
+  overflow:hidden;
+  border-radius:14px;
+  border:1px solid var(--line);
+  background:#0a0a0d;
+  min-width:0;
+}
+.reference-card.wide{
+  grid-row:1 / span 2;
+}
+.reference-card img{
+  width:100%;
+  height:100%;
+  display:block;
+  object-fit:cover;
+  object-position:center;
+  opacity:.9;
+  transition:transform .35s ease, opacity .35s ease;
+}
+.reference-card:hover img{
+  transform:scale(1.02);
+  opacity:1;
+}
+.reference-copy{
+  position:absolute;
+  z-index:2;
+  left:14px;
+  right:14px;
+  bottom:14px;
+  padding:12px 13px;
+  border-radius:10px;
+  background:rgba(8,16,35,.82);
+  backdrop-filter:blur(8px);
+  color:#fff;
+}
+.reference-copy span{
+  display:block;
+  font-size:9px;
+  letter-spacing:.13em;
+  font-weight:900;
+  color:#82aaff;
+  margin-bottom:4px;
+}
+.reference-copy strong{
+  display:block;
+  font-size:13px;
+  line-height:1.35;
+  margin-bottom:4px;
+  word-break:keep-all;
+}
+.reference-copy p{
+  margin:0;
+  color:#d9e2f3;
+  font-size:10px;
+  line-height:1.5;
+  word-break:keep-all;
+  overflow-wrap:break-word;
+}
+.reference-note{
+  margin-top:14px;
+  display:grid;
+  grid-template-columns:180px 1fr;
+  gap:18px;
+  align-items:center;
+  padding:14px 18px;
+  border-radius:12px;
+  background:linear-gradient(90deg,#10214a,#17386f);
+  color:#fff;
+}
+.reference-note strong{
+  font-size:13px;
+  color:#a8c4ff;
+  word-break:keep-all;
+}
+.reference-note span{
+  font-size:12px;
+  line-height:1.6;
+  color:#e1e9f8;
+  word-break:keep-all;
+  overflow-wrap:break-word;
+}
+@media(max-width:1100px){
+  .reference-grid{
+    grid-template-columns:1fr 1fr;
+    grid-template-rows:repeat(3,230px);
+    height:auto;
+  }
+  .reference-card.wide{
+    grid-row:auto;
+    grid-column:1 / span 2;
+  }
+}
+@media(max-width:760px){
+  .reference-grid{
+    grid-template-columns:1fr;
+    grid-template-rows:none;
+    height:auto;
+  }
+  .reference-card,
+  .reference-card.wide{
+    grid-column:auto;
+    grid-row:auto;
+    height:240px;
+  }
+  .reference-note{
+    grid-template-columns:1fr;
+    gap:6px;
+  }
+}
